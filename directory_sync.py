@@ -4,7 +4,6 @@ import os
 import filecmp
 import sys
 import time
-#new comment
 from pathlib import Path
 
 def sync_folders(source_path, replica_path, mode):
@@ -36,16 +35,16 @@ def sync_folders(source_path, replica_path, mode):
                     if mode == 'copy':
                         try:
                             os.mkdir(replica_item_path)
-                            sync_logger.info(item + ' directory not found in Replica Directory. New folder created: '+ replica_item_path)
+                            sync_logger.info(item + ' directory not found in Replica Directory. New folder created: '+ str(replica_item_path))
                             sync_folders(source_item_path,replica_item_path,mode)
                         except Exception as err:
-                            sync_logger.error('Directory cannot syncronised for path: ' + replica_item_path + '. Error: '+ str(err))
+                            sync_logger.error('Directory cannot syncronised for path: ' + str(replica_item_path) + '. Error: '+ str(err))
                     elif mode == 'check':
                         try:
                             shutil.rmtree(source_item_path)
-                            sync_logger.info('Folder deleted in Replica Directory: '+ source_item_path)
+                            sync_logger.info('Folder deleted in Replica Directory: '+ str(source_item_path))
                         except Exception as err:
-                            sync_logger.error('Replica directory cannot be syncronised. Folder cannot be deleted for path: ' + source_item_path + '. Error: '+ str(err))               
+                            sync_logger.error('Replica directory cannot be syncronised. Folder cannot be deleted for path: ' + str(source_item_path) + '. Error: '+ str(err))               
                 else:
                     sync_folders(source_item_path,replica_item_path,mode)  #if folder exist, check/copy items inside
                         
@@ -55,18 +54,18 @@ def sync_folders(source_path, replica_path, mode):
                     if mode == 'copy':
                         try:
                             shutil.copy2(source_item_path,replica_item_path)
-                            sync_logger.info('File copied from '+ source_item_path + ' to ' +replica_item_path)
+                            sync_logger.info('File copied from '+ str(source_item_path) + ' to ' + str(replica_item_path))
                         except Exception as err:
-                            sync_logger.error('File '+ source_item_path +' cannot be copied to replica folder path: ' + replica_item_path + '. Error: '+ str(err))      
+                            sync_logger.error('File '+ str(source_item_path) +' cannot be copied to replica folder path: ' + str(replica_item_path) + '. Error: '+ str(err))      
                     elif mode == 'check':
                         try:
                             os.remove(source_item_path)
-                            sync_logger.info('File deleted in Replica Directory: '+ source_item_path)
+                            sync_logger.info('File deleted in Replica Directory: '+ str(source_item_path))
                         except Exception as err:
-                            sync_logger.error('Replica directory cannot be syncronised. File ' + source_item_path +' cannot be deleted from replica directory. Error: '+ str(err))
+                            sync_logger.error('Replica directory cannot be syncronised. File ' + str(source_item_path) +' cannot be deleted from replica directory. Error: '+ str(err))
         
         except Exception as err:
-            sync_logger.error('Item can not be syncronised:' +source_path + '. Error:' + str(err))
+            sync_logger.error('Item can not be syncronised:' + str(source_path) + '. Error:' + str(err))
 
     return True           
 
