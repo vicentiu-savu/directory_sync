@@ -8,21 +8,21 @@ from pathlib import Path
 
 def sync_folders(source_path, replica_path, mode):
     '''Function checks the contents of the source_path(arg1) directory against the contents of the replica_path(arg3) directory. The third argument is the mode.
-    'check' mode - Files/Directories not found in both locations are deleted from source directory.
-    Stage 1 of folder syncronisation; the source is initialised with the path of the replica, this stage removes unwanted files.
-    'copy' mode - Files/Directories not found in both locations are copied from source directory to replica directory.
-    Stage 2 of folder syncronisation; the source is initialised with the path of the source, this stage copies files/directories not found in the replica directory.
+    'check' mode - Files/Directories not found in both locations are deleted from the source directory.
+    Stage 1 of folder synchronisation; the source is initialised with the path of the replica, this stage removes unwanted files.
+    'copy' mode - Files/Directories not found in both locations are copied from the source directory to the replica directory.
+    Stage 2 of folder synchronisation; the source is initialised with the path of the source, this stage copies files/directories not found in the replica directory.
 
     For files - function checks if a matching file is found in the replica_path directory; Deletes/Copies the file if no match is found
     For folders - 
-    'check' mode: If a matching folder is not found in the replica_path directory, folder is deleted
-    'copy' mode: If a matching folder is not found in the replica_path directory, folder is created
-    Function calls itself for every folder in the source directory having a matching folder path in replica directory (backtracking structure).
+    'check' mode: If a matching folder is not found in the replica_path directory, the folder is deleted
+    'copy' mode: If a matching folder is not found in the replica_path directory, a folder is created
+    Function calls itself for every folder in the source directory having a matching folder path in the replica directory (backtracking structure).
     '''
     try:
         dir_file_list = os.listdir(source_path)
     except Exception as err:
-        sync_logger.error('Directory cannot syncronised for path: ' + str(source_path) + '. Error: ' + str(err))
+        sync_logger.error('Directory cannot synchronised for path: ' + str(source_path) + '. Error: ' + str(err))
         return False
 
     for item in dir_file_list:  #iterates each item in source
@@ -31,22 +31,22 @@ def sync_folders(source_path, replica_path, mode):
         try:
 
             if os.path.isdir(source_item_path):     #picks out only folders, not files
-                if not os.path.isdir(replica_item_path):    #check if folder does not exist in replica directory. For copy mode, create folder and syncronise it, for check mode delete folder
+                if not os.path.isdir(replica_item_path):    #check if the folder does not exist in the replica directory. For copy mode, create a folder and synchronise it, for check mode delete folder
                     if mode == 'copy':
                         try:
                             os.mkdir(replica_item_path)
                             sync_logger.info(item + ' directory not found in Replica Directory. New folder created: '+ str(replica_item_path))
                             sync_folders(source_item_path,replica_item_path,mode)
                         except Exception as err:
-                            sync_logger.error('Directory cannot syncronised for path: ' + str(replica_item_path) + '. Error: '+ str(err))
+                            sync_logger.error('Directory cannot synchronised for path: ' + str(replica_item_path) + '. Error: '+ str(err))
                     elif mode == 'check':
                         try:
                             shutil.rmtree(source_item_path)
                             sync_logger.info('Folder deleted in Replica Directory: '+ str(source_item_path))
                         except Exception as err:
-                            sync_logger.error('Replica directory cannot be syncronised. Folder cannot be deleted for path: ' + str(source_item_path) + '. Error: '+ str(err))               
+                            sync_logger.error('Replica directory cannot be synchronised. Folder cannot be deleted for path: ' + str(source_item_path) + '. Error: '+ str(err))               
                 else:
-                    sync_folders(source_item_path,replica_item_path,mode)  #if folder exist, check/copy items inside
+                    sync_folders(source_item_path,replica_item_path, mode)  #if a folder exists, check/copy items inside
                         
             elif os.path.isfile(source_item_path):  #picks out only files, not folders
                 if not os.path.isfile(replica_item_path) or not filecmp.cmp(source_item_path, replica_item_path, shallow = True): 
@@ -62,17 +62,17 @@ def sync_folders(source_path, replica_path, mode):
                             os.remove(source_item_path)
                             sync_logger.info('File deleted in Replica Directory: '+ str(source_item_path))
                         except Exception as err:
-                            sync_logger.error('Replica directory cannot be syncronised. File ' + str(source_item_path) +' cannot be deleted from replica directory. Error: '+ str(err))
+                            sync_logger.error('Replica directory cannot be synchronised. File ' + str(source_item_path) +' cannot be deleted from replica directory. Error: '+ str(err))
         
         except Exception as err:
-            sync_logger.error('Item can not be syncronised:' + str(source_path) + '. Error:' + str(err))
+            sync_logger.error('Item can not be synchronised:' + str(source_path) + '. Error:' + str(err))
 
     return True           
 
 if __name__ == "__main__":
 
     #logger initialisation
-    sync_logger = logging.getLogger('Folder syncronisation log')
+    sync_logger = logging.getLogger('Folder synchronisation log')
     sync_logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     
@@ -105,7 +105,7 @@ if __name__ == "__main__":
         sync_log_file_handler.setLevel(logging.DEBUG)
         sync_log_file_handler.setFormatter(formatter)
         sync_logger.addHandler(sync_log_file_handler)
-        sync_logger.info('Syncronisation log file: '+ str(log_path))
+        sync_logger.info('Synchronization log file: '+ str(log_path))
 
     except Exception as err:
         sync_logger.error('Log file path error:' + str(err))
@@ -131,8 +131,8 @@ if __name__ == "__main__":
         sync_logger.info('Syncronisation Stopped')
         quit()
     
-    #run syncronisation
-    sync_logger.info('Syncronisation Started. Source directory: '+ str(source_path) + '. Replica directory: '+ str(replica_path))
+    #run synchronisation
+    sync_logger.info('Synchronization Started. Source directory: '+ str(source_path) + '. Replica directory: '+ str(replica_path))
     while True:
         if not sync_folders(replica_path,source_path, mode = 'check'):  #check all files in the replica folder are a copy from the source - check mode(refer to function description). Returns True / False if successful
             break  
